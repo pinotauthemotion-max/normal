@@ -1436,6 +1436,18 @@
 }
 </style>
 
+
+<style>
+/* iPhone SEなど低い横画面でも、操作ボタンを確実に最前面へ */
+@media (max-width: 900px) and (orientation: landscape) {
+  .container > .sidebar-panel { position: relative !important; z-index: 200 !important; }
+  .container > .sidebar-panel button { position: relative !important; z-index: 201 !important; pointer-events: auto !important; }
+  .control-section { position: relative !important; z-index: 200 !important; }
+  .control-section .btn { position: relative !important; z-index: 201 !important; pointer-events: auto !important; }
+  #history-modal { z-index: 10000 !important; }
+  #cutin-container { pointer-events: none !important; }
+}
+</style>
 </head>
 <body>
 
