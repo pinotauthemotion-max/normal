@@ -233,6 +233,34 @@
 
     /* ===== 新郎新婦キャラクター演出 ===== */
     .couple-stage { position: relative; height: 0; z-index: 7; pointer-events: none; }
+    .character { position: absolute; bottom: -250px; width: 210px; transition: transform .35s ease, filter .35s ease, opacity .35s ease; transform-origin: center bottom; filter: drop-shadow(0 12px 16px rgba(0,0,0,.45)); animation: coupleIdle 2.8s ease-in-out infinite; }
+    .character img { width: 100%; display: block; border-radius: 32px; border: 3px solid rgba(255,255,255,.45); box-shadow: 0 0 22px rgba(0,243,255,.18); }
+    .character.groom { left: -175px; animation-delay: 0s; }
+    .character.bride { right: -175px; animation-delay: .45s; }
+    @keyframes coupleIdle { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-10px) rotate(1deg); } }
+    .couple-stage.starting .groom { animation: groomStart .7s cubic-bezier(.18,.9,.25,1.35) both; }
+    .couple-stage.starting .bride { animation: brideStart .7s .08s cubic-bezier(.18,.9,.25,1.35) both; }
+    @keyframes groomStart { 0% { transform: translateX(-80px) translateY(20px) rotate(-8deg) scale(.82); opacity:.2; } 70% { transform: translateX(8px) translateY(-24px) rotate(5deg) scale(1.08); opacity:1; } 100% { transform:translateX(0) translateY(0) rotate(0) scale(1); opacity:1; } }
+    @keyframes brideStart { 0% { transform: translateX(80px) translateY(20px) rotate(8deg) scale(.82); opacity:.2; } 70% { transform: translateX(-8px) translateY(-24px) rotate(-5deg) scale(1.08); opacity:1; } 100% { transform:translateX(0) translateY(0) rotate(0) scale(1); opacity:1; } }
+    .couple-stage.rolling .character { animation: coupleRolling .45s infinite alternate ease-in-out; }
+    .couple-stage.rolling .bride { animation-delay:.12s; }
+    @keyframes coupleRolling { from { transform:translateY(0) rotate(-2deg) scale(1); filter:drop-shadow(0 0 8px var(--neon-blue)); } to { transform:translateY(-16px) rotate(2deg) scale(1.035); filter:drop-shadow(0 0 20px var(--neon-pink)); } }
+    .couple-stage.stopping .groom { animation:groomLook .45s ease-out forwards; }
+    .couple-stage.stopping .bride { animation:brideLook .45s .05s ease-out forwards; }
+    @keyframes groomLook { to { transform:translateX(18px) translateY(-8px) rotate(4deg) scale(1.07); filter:drop-shadow(0 0 24px var(--neon-yellow)); } }
+    @keyframes brideLook { to { transform:translateX(-18px) translateY(-8px) rotate(-4deg) scale(1.07); filter:drop-shadow(0 0 24px var(--neon-yellow)); } }
+    .couple-stage.celebrate .character { animation:coupleCelebrate .7s cubic-bezier(.2,.9,.3,1.45) infinite alternate; }
+    .couple-stage.celebrate .groom { filter:drop-shadow(0 0 24px var(--neon-green)); }
+    .couple-stage.celebrate .bride { filter:drop-shadow(0 0 24px var(--neon-pink)); animation-delay:.1s; }
+    @keyframes coupleCelebrate { from { transform:translateY(0) rotate(-3deg) scale(1); } to { transform:translateY(-28px) rotate(3deg) scale(1.09); } }
+    @media (max-width:1100px) { .character { width:150px; bottom:-205px; } .character.groom { left:-95px; } .character.bride { right:-95px; } }
+    @media (max-width:768px) { .couple-stage { height:105px; } .character { width:108px; bottom:-98px; opacity:.92; } .character.groom { left:-8px; } .character.bride { right:-8px; } .character img { border-radius:20px; border-width:2px; } }
+
+    .display-area {
+      background: rgba(15, 12, 27, 0.3); border: 5px solid var(--neon-blue); border-radius: 25px;
+      height: 200px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 243, 255, 0.3), inset 0 0 20px rgba(0, 243, 255, 0.2);
+    }
     #num-display {
       font-family: inherit; font-size: 8rem; font-weight: 900; color: #fff;
       text-shadow: 0 0 10px #fff, 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
@@ -490,6 +518,38 @@
       }
 
       /* キャラクター：スマホでは少し小さく、線・発光を消す */
+      .character {
+        width: 86px;
+        bottom: -92px;
+        opacity: .96;
+        filter: drop-shadow(0 5px 7px rgba(0,0,0,.32));
+      }
+
+      .character img {
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .character.groom { left: -2px; }
+      .character.bride { right: -2px; }
+
+      .couple-stage.rolling .character {
+        filter: drop-shadow(0 5px 8px rgba(0,243,255,.20));
+      }
+
+      .couple-stage.stopping .groom,
+      .couple-stage.stopping .bride {
+        filter: drop-shadow(0 5px 8px rgba(255,234,0,.22));
+      }
+
+      .couple-stage.celebrate .groom {
+        filter: drop-shadow(0 5px 8px rgba(57,255,20,.22));
+      }
+
+      .couple-stage.celebrate .bride {
+        filter: drop-shadow(0 5px 8px rgba(255,0,127,.22));
+      }
 
       /* 数字表示 */
       .display-area {
@@ -678,6 +738,18 @@
       .pop-logo span { -webkit-text-stroke-width: 1.5px; text-shadow: 0 1px 0 rgba(255,255,255,.55), 0 0 6px var(--letter-color); }
       /* 横向きスマホ：新郎新婦をしっかり大きく見せる */
       .couple-stage { height: 108px; }
+      .character {
+        width: 122px;
+        bottom: -108px;
+        filter: none;
+      }
+      .character.groom { left: 3px; }
+      .character.bride { right: 3px; }
+      .character img {
+        border-radius: 12px;
+        border-width: 1px;
+        box-shadow: none;
+      }
       .display-area { height: 82px; margin: 2px 0 4px; border-width: 2px; border-radius: 12px; box-shadow: 0 0 8px rgba(0,243,255,.2); }
       #num-display { font-size: clamp(2.7rem, 9vw, 4.5rem); text-shadow: 0 0 5px #fff, 0 0 10px var(--neon-blue); }
       .control-section { margin: 0; }
@@ -699,6 +771,10 @@
     /* 超低身長の横向き画面だけ少し縮小 */
     @media (max-width: 900px) and (orientation: landscape) and (max-height: 360px) {
       .couple-stage { height: 94px; }
+      .character {
+        width: 108px;
+        bottom: -94px;
+      }
     }
 
 
@@ -930,6 +1006,29 @@
         z-index: 7 !important;
       }
 
+      .character {
+        width: 88px !important;
+        bottom: -76px !important;
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        filter: none !important;
+      }
+
+      .character.groom {
+        left: 1px !important;
+      }
+
+      .character.bride {
+        right: 1px !important;
+      }
+
+      .character img {
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+
       /* 数字表示：拡大・バウンスなし */
       .display-area {
         flex: 0 0 74px !important;
@@ -1049,6 +1148,21 @@
       }
 
       /* キャラクターの状態切替は画像だけ。ズーム/移動演出なし */
+      .couple-stage.starting .character,
+      .couple-stage.rolling .character,
+      .couple-stage.stopping .character,
+      .couple-stage.celebrate .character {
+        animation: none !important;
+        transform: none !important;
+        filter: none !important;
+      }
+
+      /* 当選セル等の拡大演出も停止 */
+      .board-cell.active,
+      .board-cell.active.latest-active {
+        transform: none !important;
+        animation: none !important;
+      }
 
       /* 超低い横画面 */
       @media (max-height: 360px) {
@@ -1063,6 +1177,11 @@
         .couple-stage {
           flex-basis: 50px !important;
           height: 50px !important;
+        }
+
+        .character {
+          width: 76px !important;
+          bottom: -66px !important;
         }
 
         .display-area {
@@ -1436,18 +1555,6 @@
 }
 </style>
 
-
-<style>
-/* iPhone SEなど低い横画面でも、操作ボタンを確実に最前面へ */
-@media (max-width: 900px) and (orientation: landscape) {
-  .container > .sidebar-panel { position: relative !important; z-index: 200 !important; }
-  .container > .sidebar-panel button { position: relative !important; z-index: 201 !important; pointer-events: auto !important; }
-  .control-section { position: relative !important; z-index: 200 !important; }
-  .control-section .btn { position: relative !important; z-index: 201 !important; pointer-events: auto !important; }
-  #history-modal { z-index: 10000 !important; }
-  #cutin-container { pointer-events: none !important; }
-}
-</style>
 </head>
 <body>
 
@@ -1522,7 +1629,8 @@
     const bgmToggle = document.getElementById('bgm-toggle');
     const cutinContainer = document.getElementById('cutin-container');
     const cutinText = document.getElementById('cutin-text');
-let audioCtx = null, mainGain = null, compressor = null;
+    const coupleStage = document.getElementById('couple-stage');
+    let audioCtx = null, mainGain = null, compressor = null;
 
     function getHistoryClass(num) {
       if (num <= 15) return 'b';
@@ -1838,7 +1946,7 @@ let audioCtx = null, mainGain = null, compressor = null;
         } else {
           isDoubleChance = false;
         }
-        setTimeout(() => { if (isRolling && !isStopping) }, 700);
+
         btn.textContent = 'STOP'; btn.className = 'btn btn-stop';
         document.body.className = 'rolling-bg'; display.className = 'rolling-bounce';
 
@@ -1968,12 +2076,43 @@ document.addEventListener('DOMContentLoaded', function () {
 <style>
 /* 横画面：新郎新婦を全身でしっかり見せつつ、上部ボタンとSTARTに被らない配置 */
 @media (max-width: 900px) and (orientation: landscape) {
+  .character {
+    width: 420px !important;
+    bottom: -150px !important;
+    max-width: 420px !important;
+    height: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .character.groom {
+    left: -90px !important;
+  }
+
+  .character.bride {
+    right: -90px !important;
+  }
+
+  .character img {
+    width: 100% !important;
+    height: auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
 }
 </style>
 
 
 <style>
 @media (max-width: 900px) and (orientation: landscape) {
+  .character.groom {
+    left: -55px !important;
+  }
+
+  .character.bride {
+    right: -55px !important;
+  }
 }
 </style>
 
@@ -2011,6 +2150,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 }
 </style>
+
+
+
 
 </body>
 </html>
