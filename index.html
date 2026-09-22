@@ -229,13 +229,10 @@
       from { filter: hue-rotate(0deg) saturate(1.35) brightness(1.08); }
       to { filter: hue-rotate(120deg) saturate(1.8) brightness(1.22); }
     }
-    .couple-stage { position: relative; height: 0; z-index: 7; pointer-events: none; }
 
-    .display-area {
-      background: rgba(15, 12, 27, 0.3); border: 5px solid var(--neon-blue); border-radius: 25px;
-      height: 200px; display: flex; align-items: center; justify-content: center;
-      margin-bottom: 12px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 243, 255, 0.3), inset 0 0 20px rgba(0, 243, 255, 0.2);
-    }
+
+    /* ===== 新郎新婦キャラクター演出 ===== */
+    .couple-stage { position: relative; height: 0; z-index: 7; pointer-events: none; }
     #num-display {
       font-family: inherit; font-size: 8rem; font-weight: 900; color: #fff;
       text-shadow: 0 0 10px #fff, 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
@@ -1053,13 +1050,6 @@
 
       /* キャラクターの状態切替は画像だけ。ズーム/移動演出なし */
 
-      /* 当選セル等の拡大演出も停止 */
-      .board-cell.active,
-      .board-cell.active.latest-active {
-        transform: none !important;
-        animation: none !important;
-      }
-
       /* 超低い横画面 */
       @media (max-height: 360px) {
         .container {
@@ -1489,7 +1479,8 @@
     </div>
   </div>
 
-    <div id="couple-stage" class="couple-stage"></div>
+    <div id="couple-stage" class="couple-stage">
+    </div>
     <div class="display-area"><div id="num-display">BINGO</div></div>
     <div class="control-section"><button id="action-btn" class="btn btn-start">START</button></div>
 
@@ -1519,8 +1510,7 @@
     const bgmToggle = document.getElementById('bgm-toggle');
     const cutinContainer = document.getElementById('cutin-container');
     const cutinText = document.getElementById('cutin-text');
-
-    let audioCtx = null, mainGain = null, compressor = null;
+let audioCtx = null, mainGain = null, compressor = null;
 
     function getHistoryClass(num) {
       if (num <= 15) return 'b';
@@ -1721,7 +1711,8 @@
         btn.textContent = 'START'; btn.className = 'btn btn-start';
         document.body.className = '';
         popLogo.className = 'pop-logo';
-document.querySelectorAll('.board-cell').forEach(cell => cell.classList.remove('active', 'latest-active'));
+
+        document.querySelectorAll('.board-cell').forEach(cell => cell.classList.remove('active', 'latest-active'));
 
         if (bgVideo) bgVideo.play().catch(() => {});
         manageBGM();
@@ -1780,7 +1771,7 @@ document.querySelectorAll('.board-cell').forEach(cell => cell.classList.remove('
 
     function determineFinalNumber() {
       isRolling = false; isStopping = false;
-btn.textContent = 'START'; btn.className = 'btn btn-start'; display.className = '';
+      btn.textContent = 'START'; btn.className = 'btn btn-start'; display.className = '';
       document.body.className = 'win-bg';
 
       setTimeout(() => {
@@ -1817,6 +1808,7 @@ btn.textContent = 'START'; btn.className = 'btn btn-start'; display.className = 
 
       renderHistory();
       manageBGM();
+      setTimeout(() =>
     }
 
     btn.addEventListener('click', () => {
@@ -1835,6 +1827,7 @@ btn.textContent = 'START'; btn.className = 'btn btn-start'; display.className = 
         } else {
           isDoubleChance = false;
         }
+        setTimeout(() => { if (isRolling && !isStopping) }, 700);
         btn.textContent = 'STOP'; btn.className = 'btn btn-stop';
         document.body.className = 'rolling-bg'; display.className = 'rolling-bounce';
 
@@ -1843,7 +1836,7 @@ btn.textContent = 'START'; btn.className = 'btn btn-start'; display.className = 
         runRoulette();
       } else if (isRolling && !isStopping) {
         isStopping = true;
-targetExtremeCount = Math.floor(Math.random() * 5);
+        targetExtremeCount = Math.floor(Math.random() * 5);
         extremeCount = 0;
         btn.textContent = ''; btn.className = 'btn btn-waiting';
         document.body.className = 'waiting-bg';
@@ -1972,5 +1965,41 @@ document.addEventListener('DOMContentLoaded', function () {
 @media (max-width: 900px) and (orientation: landscape) {
 }
 </style>
+
+
+<style>
+@media (max-width: 900px) and (orientation: landscape) {
+  .display-area {
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  .display-area .groom {
+    left: -125px !important;
+    right: auto !important;
+  }
+
+  .display-area .bride {
+    right: -125px !important;
+    left: auto !important;
+  }
+}
+</style>
+
+
+<style>
+@media (max-width: 900px) and (orientation: landscape) {
+  .display-area .groom {
+    left: -280px !important;
+    right: auto !important;
+  }
+
+  .display-area .bride {
+    right: -280px !important;
+    left: auto !important;
+  }
+}
+</style>
+
 </body>
 </html>
