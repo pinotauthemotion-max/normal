@@ -229,7 +229,7 @@
       from { filter: hue-rotate(0deg) saturate(1.35) brightness(1.08); }
       to { filter: hue-rotate(120deg) saturate(1.8) brightness(1.22); }
     }
-
+    .couple-stage { position: relative; height: 0; z-index: 7; pointer-events: none; }
 
     .display-area {
       background: rgba(15, 12, 27, 0.3); border: 5px solid var(--neon-blue); border-radius: 25px;
@@ -492,6 +492,7 @@
         box-shadow: none;
       }
 
+      /* キャラクター：スマホでは少し小さく、線・発光を消す */
 
       /* 数字表示 */
       .display-area {
@@ -678,7 +679,8 @@
       .container::before { border-radius: 14px; padding: 3px; }
       .pop-logo { font-size: clamp(1.65rem, 6.5vw, 3rem); margin: 0 0 2px; text-shadow: none; filter: none; }
       .pop-logo span { -webkit-text-stroke-width: 1.5px; text-shadow: 0 1px 0 rgba(255,255,255,.55), 0 0 6px var(--letter-color); }
-
+      /* 横向きスマホ：新郎新婦をしっかり大きく見せる */
+      .couple-stage { height: 108px; }
       .display-area { height: 82px; margin: 2px 0 4px; border-width: 2px; border-radius: 12px; box-shadow: 0 0 8px rgba(0,243,255,.2); }
       #num-display { font-size: clamp(2.7rem, 9vw, 4.5rem); text-shadow: 0 0 5px #fff, 0 0 10px var(--neon-blue); }
       .control-section { margin: 0; }
@@ -700,10 +702,6 @@
     /* 超低身長の横向き画面だけ少し縮小 */
     @media (max-width: 900px) and (orientation: landscape) and (max-height: 360px) {
       .couple-stage { height: 94px; }
-      .character {
-        width: 108px;
-        bottom: -94px;
-      }
     }
 
 
@@ -926,6 +924,14 @@
         box-shadow: none !important;
       }
 
+      /* キャラクター：固定位置。移動・拡大アニメーションなし */
+      .couple-stage {
+        flex: 0 0 58px !important;
+        width: 100% !important;
+        height: 58px !important;
+        position: relative !important;
+        z-index: 7 !important;
+      }
 
       /* 数字表示：拡大・バウンスなし */
       .display-area {
@@ -1046,14 +1052,6 @@
       }
 
       /* キャラクターの状態切替は画像だけ。ズーム/移動演出なし */
-      .couple-stage.starting .character,
-      .couple-stage.rolling .character,
-      .couple-stage.stopping .character,
-      .couple-stage.celebrate .character {
-        animation: none !important;
-        transform: none !important;
-        filter: none !important;
-      }
 
       /* 当選セル等の拡大演出も停止 */
       .board-cell.active,
@@ -1075,11 +1073,6 @@
         .couple-stage {
           flex-basis: 50px !important;
           height: 50px !important;
-        }
-
-        .character {
-          width: 76px !important;
-          bottom: -66px !important;
         }
 
         .display-area {
@@ -1495,8 +1488,8 @@
       <button id="reset-btn" class="reset-btn">RESET</button>
     </div>
   </div>
-<div class="character bride"><img id="bride-img" src="couple_assets/bride_idle.png" alt="新婦キャラクター"></div>
-    </div>
+
+    <div id="couple-stage" class="couple-stage"></div>
     <div class="display-area"><div id="num-display">BINGO</div></div>
     <div class="control-section"><button id="action-btn" class="btn btn-start">START</button></div>
 
@@ -1526,9 +1519,7 @@
     const bgmToggle = document.getElementById('bgm-toggle');
     const cutinContainer = document.getElementById('cutin-container');
     const cutinText = document.getElementById('cutin-text');
-function setCoupleState(state) {
-      const currentState = state || 'idle';
-}
+
     let audioCtx = null, mainGain = null, compressor = null;
 
     function getHistoryClass(num) {
@@ -1730,9 +1721,7 @@ function setCoupleState(state) {
         btn.textContent = 'START'; btn.className = 'btn btn-start';
         document.body.className = '';
         popLogo.className = 'pop-logo';
-        setCoupleState('');
-
-        document.querySelectorAll('.board-cell').forEach(cell => cell.classList.remove('active', 'latest-active'));
+document.querySelectorAll('.board-cell').forEach(cell => cell.classList.remove('active', 'latest-active'));
 
         if (bgVideo) bgVideo.play().catch(() => {});
         manageBGM();
@@ -1791,8 +1780,7 @@ function setCoupleState(state) {
 
     function determineFinalNumber() {
       isRolling = false; isStopping = false;
-      setCoupleState('celebrate');
-      btn.textContent = 'START'; btn.className = 'btn btn-start'; display.className = '';
+btn.textContent = 'START'; btn.className = 'btn btn-start'; display.className = '';
       document.body.className = 'win-bg';
 
       setTimeout(() => {
@@ -1829,7 +1817,6 @@ function setCoupleState(state) {
 
       renderHistory();
       manageBGM();
-      setTimeout(() => setCoupleState(''), 2200);
     }
 
     btn.addEventListener('click', () => {
@@ -1848,9 +1835,6 @@ function setCoupleState(state) {
         } else {
           isDoubleChance = false;
         }
-
-        setCoupleState('starting');
-        setTimeout(() => { if (isRolling && !isStopping) setCoupleState('rolling'); }, 700);
         btn.textContent = 'STOP'; btn.className = 'btn btn-stop';
         document.body.className = 'rolling-bg'; display.className = 'rolling-bounce';
 
@@ -1859,8 +1843,7 @@ function setCoupleState(state) {
         runRoulette();
       } else if (isRolling && !isStopping) {
         isStopping = true;
-        setCoupleState('stopping');
-        targetExtremeCount = Math.floor(Math.random() * 5);
+targetExtremeCount = Math.floor(Math.random() * 5);
         extremeCount = 0;
         btn.textContent = ''; btn.className = 'btn btn-waiting';
         document.body.className = 'waiting-bg';
@@ -1981,101 +1964,13 @@ document.addEventListener('DOMContentLoaded', function () {
 <style>
 /* 横画面：新郎新婦を全身でしっかり見せつつ、上部ボタンとSTARTに被らない配置 */
 @media (max-width: 900px) and (orientation: landscape) {
-  .character {
-    width: 420px !important;
-    bottom: -150px !important;
-    max-width: 420px !important;
-    height: auto !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  .character.groom {
-    left: -90px !important;
-  }
-
-  .character.bride {
-    right: -90px !important;
-  }
-
-  .character img {
-    width: 100% !important;
-    height: auto !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
 }
 </style>
 
 
 <style>
 @media (max-width: 900px) and (orientation: landscape) {
-  .character.groom {
-    left: -55px !important;
-  }
-
-  .character.bride {
-    right: -55px !important;
-  }
 }
 </style>
-
-
-<style>
-@media (max-width: 900px) and (orientation: landscape) {
-  .display-area {
-    position: relative !important;
-    overflow: visible !important;
-  }
-
-  .display-area .groom {
-    left: -125px !important;
-    right: auto !important;
-  }
-
-  .display-area .bride {
-    right: -125px !important;
-    left: auto !important;
-  }
-}
-</style>
-
-
-<style>
-@media (max-width: 900px) and (orientation: landscape) {
-  .display-area .groom {
-    left: -280px !important;
-    right: auto !important;
-  }
-
-  .display-area .bride {
-    right: -280px !important;
-    left: auto !important;
-  }
-}
-</style>
-
-
-<style>
-/* スマホ横向き：実際のキャラクター親要素(couple-stage)を基準に大きく端へ寄せる */
-@media (max-width: 900px) and (orientation: landscape) {
-  .couple-stage {
-    position: relative !important;
-    overflow: visible !important;
-  }
-
-  .couple-stage .character.groom {
-    left: -178px !important;
-    right: auto !important;
-  }
-
-  .couple-stage .character.bride {
-    right: -158px !important;
-    left: auto !important;
-  }
-}
-</style>
-
 </body>
 </html>
