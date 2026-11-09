@@ -1315,7 +1315,9 @@
   }
 
   .history-modal .history-card {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column;
+    box-sizing: border-box;
     width: min(700px, 92vw) !important;
     max-width: 92vw !important;
     max-height: 82dvh !important;
@@ -1323,10 +1325,17 @@
     position: relative !important;
   }
 
+  .history-modal .history-card-header {
+    flex: none;
+  }
+
   .history-modal .history-modal-list {
     display: grid !important;
-    max-height: calc(82dvh - 30px) !important;
+    min-height: 0;
+    max-height: none !important;
+    overflow-x: hidden;
     overflow-y: auto !important;
+    overscroll-behavior-y: contain;
   }
 }
 </style>
@@ -1599,6 +1608,8 @@
   </div>
 
     <div id="couple-stage" class="couple-stage">
+      <div class="character groom"><img id="groom-img" src="couple_assets/groom_idle.png" alt="新郎キャラクター"></div>
+      <div class="character bride"><img id="bride-img" src="couple_assets/bride_idle.png" alt="新婦キャラクター"></div>
     </div>
     <div class="display-area"><div id="num-display">BINGO</div></div>
     <div class="control-section"><button id="action-btn" class="btn btn-start">START</button></div>
@@ -1630,6 +1641,33 @@
     const cutinContainer = document.getElementById('cutin-container');
     const cutinText = document.getElementById('cutin-text');
     const coupleStage = document.getElementById('couple-stage');
+
+    const groomImg = document.getElementById('groom-img');
+    const brideImg = document.getElementById('bride-img');
+
+    function setCoupleState(state) {
+      const currentState = state || 'idle';
+      coupleStage.className = `couple-stage ${state || ''}`;
+
+      const groomFile = {
+        idle: 'groom_idle.png',
+        starting: 'groom_start.png',
+        rolling: 'groom_rolling.png',
+        stopping: 'groom_stop.png',
+        celebrate: 'groom_celebrate.png'
+      }[currentState] || 'groom_idle.png';
+
+      const brideFile = {
+        idle: 'bride_idle.png',
+        starting: 'bride_start.png',
+        rolling: 'bride_rolling.png',
+        stopping: 'bride_stop.png',
+        celebrate: 'bride_celebrate.png'
+      }[currentState] || 'bride_idle.png';
+
+      groomImg.src = `couple_assets/${groomFile}`;
+      brideImg.src = `couple_assets/${brideFile}`;
+    }
     let audioCtx = null, mainGain = null, compressor = null;
 
     function getHistoryClass(num) {
@@ -1831,6 +1869,7 @@
         btn.textContent = 'START'; btn.className = 'btn btn-start';
         document.body.className = '';
         popLogo.className = 'pop-logo';
+        setCoupleState('');
 
         document.querySelectorAll('.board-cell').forEach(cell => cell.classList.remove('active', 'latest-active'));
 
@@ -1891,6 +1930,7 @@
 
     function determineFinalNumber() {
       isRolling = false; isStopping = false;
+      setCoupleState('celebrate');
       btn.textContent = 'START'; btn.className = 'btn btn-start'; display.className = '';
       document.body.className = 'win-bg';
 
@@ -1928,6 +1968,7 @@
 
       renderHistory();
       manageBGM();
+      setTimeout(() => setCoupleState(''), 2200);
     }
 
     btn.addEventListener('click', () => {
@@ -1947,6 +1988,8 @@
           isDoubleChance = false;
         }
 
+        setCoupleState('starting');
+        setTimeout(() => { if (isRolling && !isStopping) setCoupleState('rolling'); }, 700);
         btn.textContent = 'STOP'; btn.className = 'btn btn-stop';
         document.body.className = 'rolling-bg'; display.className = 'rolling-bounce';
 
@@ -1955,6 +1998,7 @@
         runRoulette();
       } else if (isRolling && !isStopping) {
         isStopping = true;
+        setCoupleState('stopping');
         targetExtremeCount = Math.floor(Math.random() * 5);
         extremeCount = 0;
         btn.textContent = ''; btn.className = 'btn btn-waiting';
@@ -2051,20 +2095,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 <style>
-/* 一覧モーダルの履歴だけ元サイズへ戻す。メイン画面の8個には影響させない */
+/* 一覧モーダルの数字とグリッドの行を同じサイズにする */
 @media (max-width: 900px) and (orientation: landscape) {
   #history-modal .history-modal-list {
-    grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, 58px) !important;
+    grid-auto-rows: 58px;
+    align-content: start;
+    box-sizing: border-box;
+    width: 100% !important;
     gap: 7px !important;
     padding: 5px !important;
   }
 
   #history-modal .history-modal-list .history-number {
-    width: auto !important;
-    height: auto !important;
+    box-sizing: border-box;
+    width: 58px !important;
+    height: 58px !important;
     min-width: 0 !important;
     min-height: 0 !important;
-    aspect-ratio: 1 / 1 !important;
     font-size: 1.05rem !important;
     border-width: 2px !important;
     box-shadow: 0 0 7px currentColor !important;
@@ -2152,7 +2200,25 @@ document.addEventListener('DOMContentLoaded', function () {
 </style>
 
 
+<style>
+/* スマホ横向き：実際のキャラクター親要素(couple-stage)を基準に大きく端へ寄せる */
+@media (max-width: 900px) and (orientation: landscape) {
+  .couple-stage {
+    position: relative !important;
+    overflow: visible !important;
+  }
 
+  .couple-stage .character.groom {
+    left: -178px !important;
+    right: auto !important;
+  }
+
+  .couple-stage .character.bride {
+    right: -158px !important;
+    left: auto !important;
+  }
+}
+</style>
 
 </body>
 </html>
