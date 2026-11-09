@@ -1608,8 +1608,6 @@
   </div>
 
     <div id="couple-stage" class="couple-stage">
-      <div class="character groom"><img id="groom-img" src="couple_assets/groom_idle.png" alt="新郎キャラクター"></div>
-      <div class="character bride"><img id="bride-img" src="couple_assets/bride_idle.png" alt="新婦キャラクター"></div>
     </div>
     <div class="display-area"><div id="num-display">BINGO</div></div>
     <div class="control-section"><button id="action-btn" class="btn btn-start">START</button></div>
@@ -1641,33 +1639,6 @@
     const cutinContainer = document.getElementById('cutin-container');
     const cutinText = document.getElementById('cutin-text');
     const coupleStage = document.getElementById('couple-stage');
-
-    const groomImg = document.getElementById('groom-img');
-    const brideImg = document.getElementById('bride-img');
-
-    function setCoupleState(state) {
-      const currentState = state || 'idle';
-      coupleStage.className = `couple-stage ${state || ''}`;
-
-      const groomFile = {
-        idle: 'groom_idle.png',
-        starting: 'groom_start.png',
-        rolling: 'groom_rolling.png',
-        stopping: 'groom_stop.png',
-        celebrate: 'groom_celebrate.png'
-      }[currentState] || 'groom_idle.png';
-
-      const brideFile = {
-        idle: 'bride_idle.png',
-        starting: 'bride_start.png',
-        rolling: 'bride_rolling.png',
-        stopping: 'bride_stop.png',
-        celebrate: 'bride_celebrate.png'
-      }[currentState] || 'bride_idle.png';
-
-      groomImg.src = `couple_assets/${groomFile}`;
-      brideImg.src = `couple_assets/${brideFile}`;
-    }
     let audioCtx = null, mainGain = null, compressor = null;
 
     function getHistoryClass(num) {
@@ -1869,7 +1840,6 @@
         btn.textContent = 'START'; btn.className = 'btn btn-start';
         document.body.className = '';
         popLogo.className = 'pop-logo';
-        setCoupleState('');
 
         document.querySelectorAll('.board-cell').forEach(cell => cell.classList.remove('active', 'latest-active'));
 
@@ -1930,7 +1900,6 @@
 
     function determineFinalNumber() {
       isRolling = false; isStopping = false;
-      setCoupleState('celebrate');
       btn.textContent = 'START'; btn.className = 'btn btn-start'; display.className = '';
       document.body.className = 'win-bg';
 
@@ -1968,7 +1937,6 @@
 
       renderHistory();
       manageBGM();
-      setTimeout(() => setCoupleState(''), 2200);
     }
 
     btn.addEventListener('click', () => {
@@ -1988,8 +1956,6 @@
           isDoubleChance = false;
         }
 
-        setCoupleState('starting');
-        setTimeout(() => { if (isRolling && !isStopping) setCoupleState('rolling'); }, 700);
         btn.textContent = 'STOP'; btn.className = 'btn btn-stop';
         document.body.className = 'rolling-bg'; display.className = 'rolling-bounce';
 
@@ -1998,7 +1964,6 @@
         runRoulette();
       } else if (isRolling && !isStopping) {
         isStopping = true;
-        setCoupleState('stopping');
         targetExtremeCount = Math.floor(Math.random() * 5);
         extremeCount = 0;
         btn.textContent = ''; btn.className = 'btn btn-waiting';
@@ -2200,25 +2165,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </style>
 
 
-<style>
-/* スマホ横向き：実際のキャラクター親要素(couple-stage)を基準に大きく端へ寄せる */
-@media (max-width: 900px) and (orientation: landscape) {
-  .couple-stage {
-    position: relative !important;
-    overflow: visible !important;
-  }
 
-  .couple-stage .character.groom {
-    left: -178px !important;
-    right: auto !important;
-  }
-
-  .couple-stage .character.bride {
-    right: -158px !important;
-    left: auto !important;
-  }
-}
-</style>
 
 </body>
 </html>
